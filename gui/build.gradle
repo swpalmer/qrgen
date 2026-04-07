@@ -1,0 +1,32 @@
+plugins {
+  id 'application'
+  id 'com.analogideas.qrgen-conventions'
+  id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+description = 'QR Code Generator GUI'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+javafx {
+  version = "26"
+  modules = [ 'javafx.controls' ]
+}
+
+dependencies {
+    implementation project(':lib')
+}
+
+application {
+    mainClass = 'com.analogideas.qrgen.gui.QRCodeFX'
+}
+
+jar {
+    manifest {
+        attributes('Main-Class' : application.mainClass)
+    }
+}

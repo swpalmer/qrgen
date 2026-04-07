@@ -1,0 +1,99 @@
+package com.analogideas.qrgen.cmd;
+
+import com.analogideas.qrgen.BitMatrix;
+import com.analogideas.qrgen.ECL;
+import com.analogideas.qrgen.QRCode;
+import com.analogideas.qrgen.QRCodeGen;
+import com.analogideas.qrgen.png.PngWriter;
+import java.io.File;
+import java.io.IOException;
+
+/**
+ * Generates a QR code from the given payload and displays it in the console.
+ */
+public class GenerateQRCode {
+
+    /**
+     * Entry point for the QR code generation application.
+     *
+     * @param args the command line arguments (optional: payload string)
+     * @throws IOException if an I/O error occurs while writing the QR code image
+     */
+    public static void main(String[] args) throws IOException {
+        boolean inverted = false;
+        int pixelSize = 4;
+        ECL ecl = ECL.M;
+        String payload = "HTTP://GOOGLE.COM/";
+        String outputFile = null;
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-p":
+                case "--payload":
+                    if (i + 1 < args.length) {
+                        payload = args[i + 1];
+                        i++;
+                    }
+                    break;
+                case "-o":
+                case "--output":
+                    if (i + 1 < args.length) {
+                        outputFile = args[i + 1];
+                        i++;
+                    }
+                    break;
+                case "-s":
+                case "--size":
+                    if (i + 1 < args.length) {
+                        pixelSize = Math.max(1, Integer.parseInt(args[i + 1]));
+                        i++;
+                    }
+                    break;
+                case "-e":
+                case "--ecl":
+                    if (i + 1 < args.length) {
+                        try {
+                            ecl = ECL.valueOf(args[i + 1].toUpperCase());
+                            i++;
+                        } catch (IllegalArgumentException e) {
+                            System.err.printf(
+                                """
+                                Invalid error correction level: %s
+                                Must be one of L, M, H, or Q\n""",
+                                args[i + 1]
+                            );
+                            System.exit(1);
+                        }
+                    }
+                    break;
+                case "-i":
+                case "--invert":
+                    inverted = true;
+                    break;
+            }
+        }
+        QRCode qr = QRCodeGen.generate(payload, ecl);
+        if (outputFile != null) {
+            PngWriter.write(qr, pixelSize, new File(outputFile));
+        } else {
+            print(qr.getMatrix(), inverted);
+        }
+    }
+
+    static void print(BitMatrix m, boolean invert) {
+        // assuming a dark background, so zero is '█' and one is ' '
+        String zero = invert ? " " : "█";
+        String one = invert ? "█" : " ";
+        int d = m.dim();
+        String border = zero.repeat(d + 4);
+        System.out.println(border);
+        System.out.println(border);
+        for (int y = 0; y < d; y++) {
+            StringBuilder sb = new StringBuilder().append(zero).append(zero);
+            for (int x = 0; x < d; x++) sb.append(m.get(x, y) ? one : zero);
+            sb.append(zero).append(zero);
+            System.out.println(sb);
+        }
+        System.out.println(border);
+        System.out.println(border);
+    }
+}

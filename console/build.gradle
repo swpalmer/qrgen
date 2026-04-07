@@ -1,0 +1,28 @@
+plugins {
+  id 'application'
+  id 'com.analogideas.qrgen-conventions'
+  id 'com.gradleup.shadow' version '9.4.1'
+}
+
+description = 'QR Code Generator App'
+
+dependencies {
+    implementation project(':lib')
+    testImplementation     'junit:junit:4.13'
+}
+
+application {
+    mainClass = 'com.analogideas.qrgen.cmd.GenerateQRCode'
+}
+
+jar {
+    manifest {
+        attributes('Main-Class' : application.mainClass)
+    }
+}
+
+tasks.named('run') {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.analogideas.qrgen.cmd.GenerateQRCode'
+    args = project.hasProperty('qrArgs') ? [project.property('qrArgs')] : ['HTTPS://WWW.ANALOGIDEAS.COM/']
+}
