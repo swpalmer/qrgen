@@ -1,10 +1,11 @@
 package com.analogideas.qrgen.cmd;
 
-import com.analogideas.qrgen.BitMatrix;
-import com.analogideas.qrgen.ECL;
-import com.analogideas.qrgen.QRCode;
-import com.analogideas.qrgen.QRCodeGen;
-import com.analogideas.qrgen.png.PngWriter;
+import com.analogideas.qrgen.api.BinaryPngWriter;
+import com.analogideas.qrgen.api.ECL;
+import com.analogideas.qrgen.api.QrCode;
+import com.analogideas.qrgen.api.QrCodeGenerator;
+import com.analogideas.qrgen.api.QrGenFactory;
+import com.analogideas.qrgen.api.ReadOnlyBitMatrix;
 import java.io.File;
 import java.io.IOException;
 
@@ -58,7 +59,7 @@ public class GenerateQRCode {
                             System.err.printf(
                                 """
                                 Invalid error correction level: %s
-                                Must be one of L, M, H, or Q\n""",
+                                Must be one of L, M, Q, or H\n""",
                                 args[i + 1]
                             );
                             System.exit(1);
@@ -71,15 +72,18 @@ public class GenerateQRCode {
                     break;
             }
         }
-        QRCode qr = QRCodeGen.generate(payload, ecl);
+        var factory = QrGenFactory.factory();
+        var qrCodeGen = factory.qrCodeGenerator();
+        QrCode qr = qrCodeGen.generate(payload, ecl);
         if (outputFile != null) {
-            PngWriter.write(qr, pixelSize, new File(outputFile));
+            var pngWriter = factory.pngWriter();
+            pngWriter.write(qr.getMatrix(), pixelSize, new File(outputFile));
         } else {
             print(qr.getMatrix(), inverted);
         }
     }
 
-    static void print(BitMatrix m, boolean invert) {
+    static void print(ReadOnlyBitMatrix m, boolean invert) {
         // assuming a dark background, so zero is '█' and one is ' '
         String zero = invert ? " " : "█";
         String one = invert ? "█" : " ";

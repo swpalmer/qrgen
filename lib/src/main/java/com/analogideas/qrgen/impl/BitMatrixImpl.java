@@ -2,14 +2,15 @@
  * Copyright 2021,2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
+import com.analogideas.qrgen.api.BitMatrix;
 import java.util.BitSet;
 
 /**
  * Represents a square matrix of bits.
  */
-public class BitMatrix {
+public class BitMatrixImpl implements BitMatrix {
 
     BitSet bits = new BitSet();
     int dim; // length of side - matrix is always square
@@ -18,7 +19,7 @@ public class BitMatrix {
      * Creates a new BitMatrix with the given dimension.
      * @param dim the dimension of the matrix
      */
-    public BitMatrix(int dim) {
+    public BitMatrixImpl(int dim) {
         this.dim = dim;
     }
 
@@ -57,7 +58,7 @@ public class BitMatrix {
      * @return a copy of this BitMatrix
      */
     public BitMatrix copy() {
-        BitMatrix c = new BitMatrix(dim);
+        var c = new BitMatrixImpl(dim);
         c.bits.or(bits);
         return c;
     }

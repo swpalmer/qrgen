@@ -27,7 +27,7 @@ for (int y = 0 ; y < dim; y++) {
 }
 ```
 
-Basic support for writing to a PNG image file is included
+Basic support for writing to a PNG image file is included:
 ```java
 import com.analogideas.qrgen.png.PngWriter;
 int moduleSize = 4; // use 4x4 pixels per module

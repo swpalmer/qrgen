@@ -2,22 +2,23 @@
  * Copyright 2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen.png;
+package com.analogideas.qrgen.impl.png;
 
-import com.analogideas.qrgen.BitMatrix;
-import com.analogideas.qrgen.QRCode;
+import com.analogideas.qrgen.api.QrCode;
+import com.analogideas.qrgen.api.ReadOnlyBitMatrix;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 
 /**
  * Writes a QR code to a PNG file.
  * See https://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
  */
-public class PngWriter {
+public class PngImpl implements com.analogideas.qrgen.api.BinaryPngWriter {
 
     static class Chunk {
 
@@ -56,7 +57,7 @@ public class PngWriter {
             buffer.flip();
         }
 
-        public void writeTo(FileChannel channel) throws IOException {
+        public void writeTo(WritableByteChannel channel) throws IOException {
             // write it
             channel.write(buffer);
             buffer.clear();
@@ -81,35 +82,44 @@ public class PngWriter {
 
     /**
      * Writes a QR code as a PNG image with the given module size.
-     * @param qrCode the QR code to write
+     * @param data the QR code matrix to write
      * @param pixelSize the size of the modules in pixels
      * @param file the file to write to
      * @throws IOException if an I/O error occurs
      */
-    public static void write(QRCode qrCode, int pixelSize, File file) throws IOException {
-        BitMatrix data = qrCode.getMatrix();
-        int dim = data.dim();
-        int imageSize = (dim + 8) * pixelSize;
+    public void write(ReadOnlyBitMatrix data, int pixelSize, File file) throws IOException {
         try (var fos = new FileOutputStream(file); var channel = fos.getChannel()) {
-            channel.write(ByteBuffer.allocate(8).putLong(pngHeader).flip());
-            ByteBuffer ihdrBuff = ByteBuffer.allocate(13);
-            ihdrBuff.putInt(imageSize); // width
-            ihdrBuff.putInt(imageSize); // height
-            ihdrBuff.put((byte) 1); // bit depth (binary)
-            ihdrBuff.put((byte) 0); // color type (grayscale)
-            ihdrBuff.put((byte) 0); // compression method (deflate/inflate compression with a sliding window of at most 32768 bytes)
-            ihdrBuff.put((byte) 0); // filter method
-            ihdrBuff.put((byte) 0); // interlace method
-            Chunk ihdr = new Chunk("IHDR", ihdrBuff.array());
-            ihdr.writeTo(channel);
-            byte[] compressedData = compress(data, imageSize, pixelSize);
-            Chunk idat = new Chunk("IDAT", compressedData);
-            idat.writeTo(channel);
-            new Chunk("IEND", new byte[0]).writeTo(channel);
+            write(data, pixelSize, channel);
         }
     }
 
-    private static byte[] compress(BitMatrix data, int imageSize, int pixelSize) {
+    /**
+     * Writes a QR code as a PNG image with the given module size to the given channel.
+     * @param data the QR code data
+     * @param pixelSize the size of the modules in pixels
+     * @param channel the channel to write to
+     * @throws IOException if an I/O error occurs
+     */
+    public void write(ReadOnlyBitMatrix data, int pixelSize, WritableByteChannel channel) throws IOException {
+        int imageSize = (data.dim() + 8) * pixelSize;
+        channel.write(ByteBuffer.allocate(8).putLong(pngHeader).flip());
+        ByteBuffer ihdrBuff = ByteBuffer.allocate(13);
+        ihdrBuff.putInt(imageSize); // width
+        ihdrBuff.putInt(imageSize); // height
+        ihdrBuff.put((byte) 1); // bit depth (binary)
+        ihdrBuff.put((byte) 0); // color type (grayscale)
+        ihdrBuff.put((byte) 0); // compression method (deflate/inflate compression with a sliding window of at most 32768 bytes)
+        ihdrBuff.put((byte) 0); // filter method
+        ihdrBuff.put((byte) 0); // interlace method
+        Chunk ihdr = new Chunk("IHDR", ihdrBuff.array());
+        ihdr.writeTo(channel);
+        byte[] compressedData = compress(data, imageSize, pixelSize);
+        Chunk idat = new Chunk("IDAT", compressedData);
+        idat.writeTo(channel);
+        new Chunk("IEND", new byte[0]).writeTo(channel);
+    }
+
+    private static byte[] compress(ReadOnlyBitMatrix data, int imageSize, int pixelSize) {
         int dim = data.dim();
         int stride = (imageSize + 7) / 8; // bytes per scanline (1 bit per pixel, packed)
         // Build raw scanlines: each row is `stride` bytes, pixels packed MSB-first.

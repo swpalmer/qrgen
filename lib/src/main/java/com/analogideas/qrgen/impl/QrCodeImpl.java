@@ -2,8 +2,11 @@
  * Copyright 2021,2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
+import com.analogideas.qrgen.api.BitMatrix;
+import com.analogideas.qrgen.api.ECL;
+import com.analogideas.qrgen.api.QrCode;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.BitSet;
@@ -12,11 +15,10 @@ import java.util.BitSet;
  * The two-dimensional representation of the QR code bit patterns, including
  * finder patterns, alignment and timing patterns and the codeword data.
  *
- * @author scott
  */
-public class QRCode {
+public class QrCodeImpl implements QrCode {
 
-    private static final Logger LOGGER = System.getLogger(QRCode.class.getName());
+    private static final Logger LOGGER = System.getLogger(QrCodeImpl.class.getName());
 
     BitMatrix modules;
     BitMatrix mask; // tracks all occupied modules (function patterns + data)
@@ -40,13 +42,13 @@ public class QRCode {
      * @param ecl The error correction level to use
      * @param codewords The codewords to encode
      */
-    public QRCode(int version, ECL ecl, BitSet codewords) {
+    public QrCodeImpl(int version, ECL ecl, BitSet codewords) {
         this.version = version;
         this.ecl = ecl;
         dim = 21 + (version - 1) * 4;
         LOGGER.log(Level.INFO, "Version: {0} ({1} x {1}), ECL: {2}", version, dim, ecl);
-        modules = new BitMatrix(dim);
-        mask = new BitMatrix(dim);
+        modules = new BitMatrixImpl(dim);
+        mask = new BitMatrixImpl(dim);
         px = py = dim - 1; // start in lower right
 
         addFinderPatterns();
@@ -276,7 +278,8 @@ public class QRCode {
      */
     private void addCodewords(BitSet codewords) {
         int totalBits =
-            ECCharacteristics.forVersion(version, ecl).nCW() * 8 + QRCodeGen.capacityTable[version - 1].remainderBits();
+            ECCharacteristics.forVersion(version, ecl).nCW() * 8 +
+            QrCodeGeneratorImpl.capacityTable[version - 1].remainderBits();
         LOGGER.log(Level.INFO, "codewords num bits = {0}", totalBits);
         for (int i = 0; i < totalBits; i += 8) {
             byte val = 0;
@@ -352,7 +355,7 @@ public class QRCode {
      * Returns the ECL used for this code.
      * @return the ECL used for this code
      */
-    public ECL getECL() {
+    public ECL getEcl() {
         return ecl;
     }
 
@@ -462,7 +465,7 @@ public class QRCode {
      */
     private int selectBestMask() {
         // Save a snapshot of the codeword modules before masking
-        BitMatrix saved = new BitMatrix(dim);
+        BitMatrix saved = new BitMatrixImpl(dim);
         for (int y = 0; y < dim; y++) for (int x = 0; x < dim; x++) saved.set(x, y, modules.get(x, y));
 
         int bestMask = 0;

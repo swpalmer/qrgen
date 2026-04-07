@@ -4,12 +4,12 @@
  */
 package com.analogideas.qrgen.gui;
 
-import com.analogideas.qrgen.BitMatrix;
-import com.analogideas.qrgen.DataCapacity;
-import com.analogideas.qrgen.ECL;
-import com.analogideas.qrgen.QRCode;
-import com.analogideas.qrgen.QRCodeGen;
-import com.analogideas.qrgen.png.PngWriter;
+import com.analogideas.qrgen.api.BinaryPngWriter;
+import com.analogideas.qrgen.api.ECL;
+import com.analogideas.qrgen.api.QrCode;
+import com.analogideas.qrgen.api.QrCodeGenerator;
+import com.analogideas.qrgen.api.QrGenFactory;
+import com.analogideas.qrgen.api.ReadOnlyBitMatrix;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,11 +42,13 @@ import javafx.stage.Stage;
  */
 public class QRCodeFX extends Application {
 
+    private QrGenFactory qrGenFactory = QrGenFactory.factory();
+    private QrCodeGenerator qrCodeGenerator = qrGenFactory.qrCodeGenerator();
     private Stage stage;
     private ImageView imageView;
     private ComboBox<Integer> versionCombo;
     private TextField payloadTF;
-    private QRCode qrCode;
+    private QrCode qrCode;
 
     private int pixelSize = 4;
 
@@ -104,7 +106,7 @@ public class QRCodeFX extends Application {
 
     private void generate(ActionEvent ae) {
         String payload = payloadTF.getText();
-        QRCode qrCode = QRCodeGen.generate(payload, ECL.M);
+        qrCode = qrCodeGenerator.generate(payload, ECL.M);
         imageView.setImage(getImage(qrCode, pixelSize));
         stage.setMinWidth(160 + imageView.getImage().getWidth());
         stage.setMinHeight(200 + imageView.getImage().getHeight());
@@ -119,7 +121,8 @@ public class QRCodeFX extends Application {
         File file = fileChooser.showSaveDialog(stage);
         if (file != null) {
             try {
-                PngWriter.write(qrCode, pixelSize, file);
+                var pngWriter = qrGenFactory.pngWriter();
+                pngWriter.write(qrCode.getMatrix(), pixelSize, file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -127,15 +130,15 @@ public class QRCodeFX extends Application {
     }
 
     /**
-     * Converts a {@link QRCode} into a {@link Image} for display.
+     * Converts a {@link QrCode} into a {@link Image} for display.
      *
      * @param code the QR code to convert
      * @param pixelSize the size of each module in the image
      * @return the image representation of the QR code
      */
-    public static Image getImage(QRCode code, int pixelSize) {
+    public static Image getImage(QrCode code, int pixelSize) {
         final int PIXEL_SIZE = Math.max(1, pixelSize);
-        BitMatrix matrix = code.getMatrix();
+        ReadOnlyBitMatrix matrix = code.getMatrix();
         int d = matrix.dim();
         // image with 4px border on each side (quiet zone)
         var image = new WritableImage(PIXEL_SIZE * (d + 8), PIXEL_SIZE * (d + 8));

@@ -2,7 +2,7 @@
  * Copyright 2021,2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
 import java.util.BitSet;
 

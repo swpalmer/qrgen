@@ -2,16 +2,19 @@
  * Copyright 2021,2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
+import com.analogideas.qrgen.api.BitMatrix;
+import com.analogideas.qrgen.api.ECL;
+import com.analogideas.qrgen.api.QrCode;
+import com.analogideas.qrgen.api.QrCodeGenerator;
 import java.nio.charset.StandardCharsets;
 
 /**
  * Simple library for generating URL QR Codes.
  *
- * @author scott@analogideas.com
  */
-public class QRCodeGen {
+public class QrCodeGeneratorImpl implements QrCodeGenerator {
 
     /**
      * The minimum dimension of a QR code, in modules.
@@ -123,10 +126,6 @@ public class QRCodeGen {
     }
 
     // from spec Table 3
-    private int alphanumericCharCountBits() {
-        return alphanumericCharCountBits(version);
-    }
-
     /**
      * Returns the number of bits per character for alphanumeric mode.
      *
@@ -140,10 +139,6 @@ public class QRCodeGen {
     }
 
     // from spec Table 3
-    private int bytecharCountBits() {
-        return bytecharCountBits(version);
-    }
-
     /**
      * Returns the number of bits per character for byte mode.
      *
@@ -156,10 +151,6 @@ public class QRCodeGen {
     }
 
     // from spec Table 3
-    private int kanjiCharCountBits() {
-        return kanjiCharCountBits(version);
-    }
-
     /**
      * Returns the number of bits per character for kanji mode.
      *
@@ -509,9 +500,9 @@ public class QRCodeGen {
      *
      * @param payload the data to encode
      * @param ecl     the error correction level
-     * @return the generated {@link QRCode}
+     * @return the generated {@link QrCode}
      */
-    public static QRCode generate(String payload, ECL ecl) {
+    public QrCode generate(String payload, ECL ecl) {
         Mode mode = selectMode(payload);
         int version = selectVersion(mode, ecl, payload);
         DataCapacity dc = DataCapacity.forVersion(version, ecl);
@@ -569,7 +560,7 @@ public class QRCodeGen {
         );
 
         // Step 5-7: Matrix placement, masking, format/version info
-        return new QRCode(version, ecl, out.toBitSet());
+        return new QrCodeImpl(version, ecl, out.toBitSet());
     }
 }
 

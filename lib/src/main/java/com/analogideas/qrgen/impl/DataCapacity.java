@@ -2,9 +2,9 @@
  * Copyright 2021,2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
-import com.analogideas.qrgen.ECL;
+import com.analogideas.qrgen.api.ECL;
 
 /**
  * Determines the data capacity of a QR code for a given mode and error correction level.
@@ -190,7 +190,7 @@ public record DataCapacity(
      * @param length the length of the payload to encode
      * @return the version number of the QR code that can fit the payload, or -1 if no suitable version is found
      */
-    public static int fitToVersion(QRCodeGen.Mode mode, ECL ecl, int length) {
+    public static int fitToVersion(QrCodeGeneratorImpl.Mode mode, ECL ecl, int length) {
         final int eclOffset = ecl.ordinal();
         final int maxVersion = 40;
         for (int i = 0; i < maxVersion; i++) {

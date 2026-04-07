@@ -2,10 +2,12 @@
  * Copyright 2021 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.analogideas.qrgen.api.QrCodeGenerator;
+import com.analogideas.qrgen.api.QrGenFactory;
 import org.junit.jupiter.api.Test;
 
 public class QRCodeGenTest {
@@ -19,7 +21,7 @@ public class QRCodeGenTest {
     public void testForURL() {
         System.out.println("forURL");
         String url = "";
-        QRCodeGen instance = new QRCodeGen();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
         boolean[][] expResult = null;
         boolean[][] result = instance.forURL(url);
         assertArrayEquals(expResult, result);
@@ -34,7 +36,7 @@ public class QRCodeGenTest {
     public void testEncodeNumeric() {
         System.out.println("encodeNumeric");
         String digits = "01234567";
-        QRCodeGen instance = new QRCodeGen();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
         //                  mode   char count         '012'        '345'      '67'
         String expResult = "0001" + "0000001000" + "0000001100" + "0101011001" + "1000011";
         BitStream result = instance.encodeNumeric(digits);
@@ -57,7 +59,7 @@ public class QRCodeGenTest {
     public void testEncodeAlphanumeric() {
         System.out.println("encodeAlphanumeric");
         String characters = "AC-42";
-        QRCodeGen instance = new QRCodeGen();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
         // AC-42  --> (10,12,41,4,2)
         // 10*45+12 = 461 = 00111001110
         // 41*45+4 = 1849 = 11100111001

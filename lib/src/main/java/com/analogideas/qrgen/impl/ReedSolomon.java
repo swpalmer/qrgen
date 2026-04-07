@@ -2,7 +2,7 @@
  * Copyright 2026 Scott W. Palmer
  * All Rights Reserved.
  */
-package com.analogideas.qrgen;
+package com.analogideas.qrgen.impl;
 
 /**
  * Reed-Solomon error correction codeword generation for QR codes.

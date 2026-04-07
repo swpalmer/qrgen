@@ -1,8 +1,8 @@
-package com.analogideas.qrgen.png;
+package com.analogideas.qrgen.impl.png;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.analogideas.qrgen.png.PngWriter.Chunk;
+import com.analogideas.qrgen.impl.png.PngImpl.Chunk;
 import org.junit.jupiter.api.Test;
 
 class PngWriterTest {
