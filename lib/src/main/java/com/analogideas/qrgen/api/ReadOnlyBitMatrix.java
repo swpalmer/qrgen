@@ -1,5 +1,8 @@
 package com.analogideas.qrgen.api;
 
+/**
+ * A read-only interface for a bit matrix.
+ */
 public interface ReadOnlyBitMatrix {
     /**
      * Returns the dimension of the matrix (width and height).

@@ -42,7 +42,7 @@ import javafx.stage.Stage;
  */
 public class QRCodeFX extends Application {
 
-    private QrGenFactory qrGenFactory = QrGenFactory.factory();
+    private QrGenFactory qrGenFactory = QrGenFactory.instance;
     private QrCodeGenerator qrCodeGenerator = qrGenFactory.qrCodeGenerator();
     private Stage stage;
     private ImageView imageView;

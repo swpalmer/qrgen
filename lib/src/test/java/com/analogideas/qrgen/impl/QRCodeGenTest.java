@@ -21,7 +21,7 @@ public class QRCodeGenTest {
     public void testForURL() {
         System.out.println("forURL");
         String url = "";
-        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.instance.qrCodeGenerator();
         boolean[][] expResult = null;
         boolean[][] result = instance.forURL(url);
         assertArrayEquals(expResult, result);
@@ -36,7 +36,7 @@ public class QRCodeGenTest {
     public void testEncodeNumeric() {
         System.out.println("encodeNumeric");
         String digits = "01234567";
-        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.instance.qrCodeGenerator();
         //                  mode   char count         '012'        '345'      '67'
         String expResult = "0001" + "0000001000" + "0000001100" + "0101011001" + "1000011";
         BitStream result = instance.encodeNumeric(digits);
@@ -59,7 +59,7 @@ public class QRCodeGenTest {
     public void testEncodeAlphanumeric() {
         System.out.println("encodeAlphanumeric");
         String characters = "AC-42";
-        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.factory().qrCodeGenerator();
+        QrCodeGeneratorImpl instance = (QrCodeGeneratorImpl) QrGenFactory.instance.qrCodeGenerator();
         // AC-42  --> (10,12,41,4,2)
         // 10*45+12 = 461 = 00111001110
         // 41*45+4 = 1849 = 11100111001

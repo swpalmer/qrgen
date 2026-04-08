@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
 
 /**
- * Writes 1-bit PNG images from a {@link ReadOnlyBitMatrix}.
+ * Writes 1-bit-per-pixel PNG images from a {@link ReadOnlyBitMatrix}.
  */
 public interface BinaryPngWriter {
     /**

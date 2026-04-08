@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.WritableByteChannel;
 
+/**
+ * An implementation of {@link BinarySvgWriter} that writes SVG data to a file or stream.
+ */
 public class SvgImpl implements BinarySvgWriter {
 
     @Override

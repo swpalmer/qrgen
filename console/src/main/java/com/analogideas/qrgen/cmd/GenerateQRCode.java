@@ -72,7 +72,7 @@ public class GenerateQRCode {
                     break;
             }
         }
-        var factory = QrGenFactory.factory();
+        var factory = QrGenFactory.instance;
         var qrCodeGen = factory.qrCodeGenerator();
         QrCode qr = qrCodeGen.generate(payload, ecl);
         if (outputFile != null) {

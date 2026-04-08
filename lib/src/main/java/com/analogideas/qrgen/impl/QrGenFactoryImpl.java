@@ -7,6 +7,9 @@ import com.analogideas.qrgen.api.QrGenFactory;
 import com.analogideas.qrgen.impl.png.PngImpl;
 import com.analogideas.qrgen.impl.svg.SvgImpl;
 
+/**
+ * The default implementation of {@link QrGenFactory}.
+ */
 public class QrGenFactoryImpl implements QrGenFactory {
 
     @Override
