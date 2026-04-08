@@ -112,6 +112,7 @@ public class PngImpl implements com.analogideas.qrgen.api.BinaryPngWriter {
      * @throws IOException if an I/O error occurs
      */
     public void write(ReadOnlyBitMatrix data, int pixelSize, WritableByteChannel channel) throws IOException {
+        // +8 for quiet area of 4 on each side
         int imageSize = (data.dim() + 8) * pixelSize;
         channel.write(ByteBuffer.allocate(8).putLong(pngHeader).flip());
         ByteBuffer ihdrBuff = ByteBuffer.allocate(13);
@@ -140,14 +141,10 @@ public class PngImpl implements com.analogideas.qrgen.api.BinaryPngWriter {
         for (int row = 0; row < imageSize; row++) {
             // module row in the QR matrix (may be outside matrix = white)
             int matrixRow = row / pixelSize - quietModules;
+            if (matrixRow < 0 || matrixRow >= dim) continue;
             for (int col = 0; col < imageSize; col++) {
                 int matrixCol = col / pixelSize - quietModules;
-                boolean dark =
-                    matrixRow >= 0 &&
-                    matrixRow < dim &&
-                    matrixCol >= 0 &&
-                    matrixCol < dim &&
-                    data.get(matrixCol, matrixRow);
+                boolean dark = matrixCol >= 0 && matrixCol < dim && data.get(matrixCol, matrixRow);
                 if (dark) {
                     int byteIdx = row * stride + col / 8;
                     scanlines[byteIdx] |= (byte) (0x80 >>> (col % 8));

@@ -16,14 +16,14 @@
 package com.analogideas.qrgen.impl;
 
 import com.analogideas.qrgen.api.BitMatrix;
-import java.util.BitSet;
+import java.util.Arrays;
 
 /**
  * Represents a square matrix of bits.
  */
 public class BitMatrixImpl implements BitMatrix {
 
-    BitSet bits = new BitSet();
+    byte[][] bits;
     int dim; // length of side - matrix is always square
 
     /**
@@ -32,6 +32,15 @@ public class BitMatrixImpl implements BitMatrix {
      */
     public BitMatrixImpl(int dim) {
         this.dim = dim;
+        bits = new byte[dim][(dim + 7) / 8];
+    }
+
+    private BitMatrixImpl(BitMatrixImpl other) {
+        this.dim = other.dim;
+        this.bits = new byte[dim][];
+        for (int i = 0; i < dim; i++) {
+            this.bits[i] = other.bits[i].clone();
+        }
     }
 
     /**
@@ -50,7 +59,7 @@ public class BitMatrixImpl implements BitMatrix {
      */
     public boolean get(int x, int y) {
         assert x >= 0 && x < dim && y >= 0 && y < dim;
-        return bits.get(x * dim + y);
+        return (bits[y][x / 8] & (0x80 >>> (x & 7))) != 0;
     }
 
     /**
@@ -61,7 +70,15 @@ public class BitMatrixImpl implements BitMatrix {
      */
     public void set(int x, int y, boolean b) {
         assert x >= 0 && x < dim && y >= 0 && y < dim;
-        bits.set(x * dim + y, b);
+        byte[] row = bits[y];
+        int col = x / 8;
+        byte v = row[col];
+        if (b) {
+            v |= 0x80 >>> (x & 7);
+        } else {
+            v &= ~(0x80 >>> (x & 7));
+        }
+        row[col] = v;
     }
 
     /**
@@ -69,8 +86,6 @@ public class BitMatrixImpl implements BitMatrix {
      * @return a copy of this BitMatrix
      */
     public BitMatrix copy() {
-        var c = new BitMatrixImpl(dim);
-        c.bits.or(bits);
-        return c;
+        return new BitMatrixImpl(this);
     }
 }
