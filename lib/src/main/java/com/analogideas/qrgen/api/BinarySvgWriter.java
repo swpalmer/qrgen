@@ -45,4 +45,11 @@ public interface BinarySvgWriter {
      * @throws IOException if an I/O error occurs
      */
     void write(ReadOnlyBitMatrix data, OutputStream os) throws IOException;
+
+    /**
+     * Returns the QR code as an SVG string.
+     * @param data the QR code data
+     * @return the SVG representation of the QR code
+     */
+    String toSvgString(ReadOnlyBitMatrix data);
 }

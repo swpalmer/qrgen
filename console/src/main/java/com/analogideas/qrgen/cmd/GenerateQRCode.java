@@ -76,8 +76,17 @@ public class GenerateQRCode {
         var qrCodeGen = factory.qrCodeGenerator();
         QrCode qr = qrCodeGen.generate(payload, ecl);
         if (outputFile != null) {
-            var pngWriter = factory.pngWriter();
-            pngWriter.write(qr.getMatrix(), pixelSize, new File(outputFile));
+            var extension = outputFile.substring(outputFile.lastIndexOf('.') + 1).toLowerCase();
+            if (extension.equals("png")) {
+                var pngWriter = factory.pngWriter();
+                pngWriter.write(qr.getMatrix(), pixelSize, new File(outputFile));
+            } else if (extension.equals("svg")) {
+                var svgWriter = factory.svgWriter();
+                svgWriter.write(qr.getMatrix(), new File(outputFile));
+            } else {
+                System.err.println("Unsupported output format: " + extension);
+                System.exit(1);
+            }
         } else {
             print(qr.getMatrix(), inverted);
         }
